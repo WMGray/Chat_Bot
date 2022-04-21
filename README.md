@@ -7,8 +7,11 @@
 
 ### 数据集
 [情感对话生成数据集](https://www.biendata.xyz/ccf_tcci2018/datasets/ecg/)
+
 ### 语料清洗（正则化、切分、判断）
-1. 
+1. 将对话分为Post、Response两部分,分别保存在`Post.tsv`和`Response.tsv`中,每个对话单独一行
+2. `Response_emo.tsv`中保存了对话的情感标签,每个对话单独一行
+3. 删去句子中多余的符号，如`!!!`改为`!`
 
 
 # 参考文献

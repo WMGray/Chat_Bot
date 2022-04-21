@@ -5,7 +5,23 @@ import json
 import codecs
 from config import Config
 import pandas as pd
+import re
 
+
+def regular(line):
+    """句子规范化"""
+    line = re.sub(r'…{1,100}', '…', line)
+    line = re.sub(r'\.{3,100}', '…', line)
+    line = re.sub(r'···{2,100}', '…', line)
+    line = re.sub(r'\.{1,100}', '。', line)
+    line = re.sub(r'。{1,100}', '。', line)
+    line = re.sub(r'？{1,100}', '？', line)
+    line = re.sub(r'!{1,100}', '！', line)
+    line = re.sub(r'！{1,100}', '！', line)
+    line = re.sub(r'~{1,100}', '～', line)
+    line = re.sub(r'～{1,100}', '～', line)
+
+    return line
 
 def process_train(data_name, Post_name, Response_name, Response_emo_name):
     """处理ecg_train_data.json"""
@@ -23,6 +39,10 @@ def process_train(data_name, Post_name, Response_name, Response_emo_name):
         post_emo = post[1]
         response_sentence = response[0].replace('\n', '').replace(' ', '').strip()
         response_emo = response[1]
+
+        # 句子规范化
+        post_sentence = regular(post_sentence)
+        response_sentence = regular(response_sentence)
 
         # 写入文件
         Post.write(post_sentence + '\n')
@@ -50,6 +70,10 @@ def process_test(data_name, Post_name, Response_name, Response_emo_name):
     for index in range(0, len(scores)):
         if scores[index] == 2:
             # print(post[index], response[index], response_emo[index], emo_dict[response_emo[index]])
+            # 句子规范化
+            post_sentence = regular(post[index])
+            response_sentence = regular(response[index])
+
             Post.write(post[index] + '\n')
             Response.write(response[index] + '\n')
             Response_emo.write(str(emo_dict[response_emo[index]]) + '\n')
@@ -70,10 +94,13 @@ def process():
     Response_emo_name = Config.Response_emo_path
 
     print("开始处理ecg_train_data.json")
-    # process_train(train_data_path, Post_name, Response_name, Response_emo_name)
+    process_train(train_data_path, Post_name, Response_name, Response_emo_name)
 
     print("开始处理ecg_test_data.xlsx")
     process_test(test_data_path, Post_name, Response_name, Response_emo_name)
+
+    print("处理数据集完成")
+
 
 if __name__ == "__main__":
     process()

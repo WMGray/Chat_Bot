@@ -1,0 +1,45 @@
+configuration:
+  name: Seq2Sseq
+  workplace: ./Data/
+
+  embeddings:
+    embed_size: 200
+    vocab_size: 50000
+
+  encoder:
+    bidirectional: True
+    cell_type: LSTM
+    num_layers: 2
+    num_units: 512
+
+  decoder:
+    attn_num_units: 512
+    cell_type: LSTM
+    num_layers: 2
+    num_units: 512
+    state_pass: True
+    infer_max_iter: 25
+
+  inference:
+    is_beam_search: True
+    beam_size: 5
+    infer_batch_size: 1
+    infer_source_file: ./Data/Post_dev.tsv
+    infer_source_max_length: 25
+    output_path: ./Data/prediciton.tsv
+
+  training:
+    batch_size: 64
+    checkpoint_every: 1000
+    train_source_file: ./Data/Post_train.tsv
+    train_target_file: ./Data/Response_train.tsv
+    dev_source_file: ./Data/Post_dev.tsv
+    dev_target_file: ./Data/Response_dev.tsv
+    max_length: 25
+    gpu_fraction: 0.5
+    gpu_id: '6'
+    l2_regularize: null
+    learning_rate: 0.001
+    max_checkpoints: 100
+    print_every: 200
+    train_steps: 1000000

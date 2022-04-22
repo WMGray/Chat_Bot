@@ -1,0 +1,20 @@
+configuration:
+  name: data_process
+  workplace: ./Data/
+  encoding: utf-8
+
+  train_data_path: ./Data/ecg_train_data.json
+  test_data_path: ./Data/ecg_test_data.xlsx
+
+  Post_train_file: ./Data/train_Post.tsv
+  Response_train_file: ./Data/train_Response.tsv
+  Choice_train_file: ./Data/train_Choice.tsv
+  Emo_train_file: ./Data/train_Emo.tsv
+
+  Post_test_file: ./Data/dev_Post.tsv
+  Response_test_file: ./Data/dev_Response.tsv
+  Choice_test_file: ./Data/dev_Choice.tsv
+  Emo_test_file: ./Data/dec_Emo.tsv
+
+  Hownet_file_path: ./Data/Hownet/
+  Emotion_Dict_file: ./Data/Emotion_Dict.json

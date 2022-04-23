@@ -1,7 +1,8 @@
 # 基于SeqSeq的情感聊天机器人
 
 ## 文件介绍
-- **config.py**: 配置文件
+- **configs**: 配置文件保存路径
+  1. **data.yaml**: `dataset.py`配置文件
 - **dataset.py**: 处理数据集
 ## 数据处理
 
@@ -9,9 +10,12 @@
 [情感对话生成数据集](https://www.biendata.xyz/ccf_tcci2018/datasets/ecg/)
 
 ### 语料清洗（正则化、切分、判断）
-1. 将对话分为Post、Response两部分,分别保存在`Post.tsv`和`Response.tsv`中,每个对话单独一行
+1. 将对话分离成`Post`和`Response`，并进行`jieba`分词
 2. `Response_emo.tsv`中保存了对话的情感标签,每个对话单独一行
-3. 删去句子中多余的符号，如`!!!`改为`!`
+3. 规范每一个句子,删去句子中多余的符号，如`!!!`改为`!`
+4. 创建情感词典，词典来源为`知网Hownet情感词典`中的`正面情感词语(中文)`、`负面情感词语(中文)`和`BosonNLP情感词典`中的`正面情绪词`和`负面情绪词`
+5. 对`train_Response.tsv`和`dev_Response.tsv`中的每一个词语进行情感标记，正向标记为`1`，负向标记为`-1`,不在情感词典中的标记为`0`,然后分别保存在 
+   `train_Choice.tsv`和`dev_Choice.tsv`中
 
 
 # 参考文献

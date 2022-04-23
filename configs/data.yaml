@@ -6,15 +6,15 @@ configuration:
   train_data_path: ./Data/ecg_train_data.json
   test_data_path: ./Data/ecg_test_data.xlsx
 
-  Post_train_file: ./Data/train_Post.tsv
-  Response_train_file: ./Data/train_Response.tsv
-  Choice_train_file: ./Data/train_Choice.tsv
-  Emo_train_file: ./Data/train_Emo.tsv
+  train_Post_file: ./Data/train_Post.tsv
+  train_Response_file: ./Data/train_Response.tsv
+  train_Choice_file: ./Data/train_Choice.tsv
+  train_Emo_file: ./Data/train_Emo.tsv
 
-  Post_test_file: ./Data/dev_Post.tsv
-  Response_test_file: ./Data/dev_Response.tsv
-  Choice_test_file: ./Data/dev_Choice.tsv
-  Emo_test_file: ./Data/dec_Emo.tsv
+  dev_Post_file: ./Data/dev_Post.tsv
+  dev_Response_file: ./Data/dev_Response.tsv
+  dev_Choice_file: ./Data/dev_Choice.tsv
+  dev_Emo_file: ./Data/dev_Emo.tsv
 
-  Hownet_file_path: ./Data/Hownet/
+  emo_words_file_path: ./Data/Emotion_words/
   Emotion_Dict_file: ./Data/Emotion_Dict.json

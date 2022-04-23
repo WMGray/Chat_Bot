@@ -38,8 +38,12 @@ def regular(line):
 
     return line
 
+
 def process_train(data_name, Post_name, Response_name, Response_emo_name, encoding):
     """处理ecg_train_data.json"""
+    if os.path.exists(Post_name) and os.path.exists(Response_name) and os.path.exists(Response_emo_name):
+        print('文件已存在，跳过处理')
+        return
     # 读取数据
     data = codecs.open(data_name, encoding=encoding, errors='replace')
     Post = codecs.open(Post_name, 'a', encoding=encoding)
@@ -48,7 +52,7 @@ def process_train(data_name, Post_name, Response_name, Response_emo_name, encodi
 
     data_list = json.load(data)
     for conversation in data_list:
-        post, response = conversation[0], conversation[1]   # 取出每一个对话
+        post, response = conversation[0], conversation[1]  # 取出每一个对话
 
         post_sentence = post[0].replace('\n', '').replace(' ', '').strip()
         post_emo = post[1]
@@ -76,6 +80,9 @@ def process_train(data_name, Post_name, Response_name, Response_emo_name, encodi
 
 def process_test(data_name, Post_name, Response_name, Response_emo_name, encoding):
     """处理ecg_test_data.xlsx"""
+    if os.path.exists(Post_name) and os.path.exists(Response_name) and os.path.exists(Response_emo_name):
+        print('文件已存在，跳过处理')
+        return
     # 读取数据
     data = pd.read_excel(data_name)
     Post = codecs.open(Post_name, 'a', encoding=encoding)
@@ -109,28 +116,68 @@ def process_test(data_name, Post_name, Response_name, Response_emo_name, encodin
 def create_emo_dict(Hownet_path, Emo_dict_path):
     """创建情感词典"""
     if os.path.exists(Emo_dict_path):  # 如果存在，则直接读取
+        print('情感词典已存在，加载词典')
         emo_dict = json.load(open(Emo_dict_path, 'r'))
         return emo_dict
     else:
+        print('创建情感词典')
         emo_dict = {'positive': [], 'negative': []}
         for file in os.listdir(Hownet_path):
-            if file.startswith('正面'):   # 正面情感词典
-                f = codecs.open(Hownet_path + file, encoding='GBK')
-                data = f.readlines()[2:]
+            if file.startswith('正面'):  # 正面情感词典
+                try:
+                    with codecs.open(Hownet_path + file, 'r', encoding='utf-8') as f:
+                        data = f.readlines()[2:]
+                except:
+                    with codecs.open(Hownet_path + file, 'r', encoding='gbk') as f:
+                        data = f.readlines()[2:]
                 emo_dict['positive'] += [line.strip() for line in data]
                 f.close()
                 print('正面情感词典读取完毕')
-            else:   # 负面情感词典
-                f = codecs.open(Hownet_path + file, encoding='GBK')
-                data = f.readlines()[2:]
+            else:  # 负面情感词典
+                try:
+                    with codecs.open(Hownet_path + file, 'r', encoding='utf-8') as f:
+                        data = f.readlines()[2:]
+                except:
+                    with codecs.open(Hownet_path + file, 'r', encoding='gbk') as f:
+                        data = f.readlines()[2:]
                 emo_dict['negative'] += [line.strip() for line in data]
                 f.close()
                 print('负面情感词典读取完毕')
 
+        emo_dict['positive'] = list(set(emo_dict['positive']))
+        emo_dict['negative'] = list(set(emo_dict['negative']))
         # 写入文件
-        json.dump(emo_dict, open(Emo_dict_path, 'w'))
+        json.dump(emo_dict, open(Emo_dict_path, 'w', encoding='utf-8'))
+        print('情感词典写入完毕')
+
+        return emo_dict
 
 
+def mark_emo(Response_path, Choice_path, emo_dict, encoding):
+    """标记情感词"""
+    if os.path.exists(Choice_path):  # 如果存在，则不进行标记
+        print('已标记，跳过')
+        return
+    # 打开文件
+    Response = codecs.open(Response_path, 'r', encoding=encoding)
+    Choice = codecs.open(Choice_path, 'w', encoding=encoding)
+
+    for index, line in enumerate(Response):
+        words = line.strip().split()
+        emo = []
+        for word in words:
+            if word in emo_dict['positive']:
+                emo.append(1)
+            elif word in emo_dict['negative']:
+                emo.append(-1)
+            else:
+                emo.append(0)
+        Choice.write(' '.join([str(emo[i]) for i in range(len(emo))]) + '\n')
+
+
+    # 关闭文件
+    Response.close()
+    Choice.close()
 
 
 def process():
@@ -146,32 +193,40 @@ def process():
     test_data_path = config["test_data_path"]
 
     # 训练集
-    Post_train_path = config["Post_train_file"]
-    Response_train_path = config["Response_train_file"]
-    Emo_train_path = config["Emo_train_file"]
+    train_Post_path = config["train_Post_file"]
+    train_Response_path = config["train_Response_file"]
+    train_Choice_path = config["train_Choice_file"]
+    train_Emo_path = config["train_Emo_file"]
 
     # 开发集
-    Post_test_path = config["Post_test_file"]
-    Response_test_path = config["Response_test_file"]
-    Emo_test_path = config["Emo_test_file"]
+    dev_Post_path = config["dev_Post_file"]
+    dev_Response_path = config["dev_Response_file"]
+    dev_Choice_path = config["dev_Choice_file"]
+    dev_Emo_path = config["dev_Emo_file"]
 
     # 编码方式
     encoding = config["encoding"]
 
     # 知网Hownet情感词典
-    Hownet_path = config["Hownet_file_path"]
+    Emotion_words_path = config["emo_words_file_path"]
     Emotion_dict_file = config["Emotion_Dict_file"]
 
-    print("创建情感词典：")
-    create_emo_dict(Hownet_path, Emotion_dict_file)
-
-    """print("开始处理ecg_train_data.json")
-    process_train(train_data_path, Post_train_path, Response_train_path, Emo_train_path, encoding)
-
+    print("开始处理ecg_train_data.json")
+    process_train(train_data_path, train_Post_path, train_Response_path, train_Emo_path, encoding)
     print("开始处理ecg_test_data.xlsx")
-    process_test(test_data_path, Post_test_path, Response_test_path, Emo_test_path, encoding)
+    process_test(test_data_path, dev_Post_path, dev_Response_path, dev_Emo_path, encoding)
+    print("处理数据集完成")
 
-    print("处理数据集完成")"""
+    print("构造情感词典")
+    emo_dict = create_emo_dict(Emotion_words_path, Emotion_dict_file)
+    print("构造情感词典完毕,共加载正向词{}个，负向词{}个".format(len(emo_dict['positive']), len(emo_dict['negative'])))
+
+    print("开始标记情感词（Choice文件）")
+    print("开始处理train_Response.tsv")
+    mark_emo(train_Response_path, train_Choice_path, emo_dict, encoding)
+    print("开始处理dev_Response.tsv")
+    mark_emo(dev_Response_path, dev_Choice_path, emo_dict, encoding)
+    print("标记情感词完毕")
 
 
 if __name__ == "__main__":

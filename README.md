@@ -29,3 +29,26 @@
 > If you use our corpus, please cite: Yan Song, Shuming Shi, Jing Li, and Haisong Zhang. Directional Skip-Gram: Explicitly Distinguishing Left and Right Context for Word Embeddings. NAACL 2018 (Short Paper). [pdf] [bib]
 
 >https://developer.aliyun.com/article/647550?spm=a2c6h.24874632.expert-profile.227.5b4aadc9oATARD
+
+# 问题及解决办法
+1. from tensorflow.contrib.seq2seq import ...
+   问题：ModuleNotFoundError: No module named ‘tensorflow.contrib’
+   解决方法：from tensorflow_addons.seq2seq import ...
+2. from tensorflow_addons.seq2seq import ...
+   问题： cannot import name 'GreedyEmbeddingHelper' from 'tensorflow_addons.seq2seq'
+   解决方法：修改为GreedyEmbeddingSampler
+3. from tensorflow.contrib.rnn import LSTMStateTuple
+   问题：No module named 'tensorflow.contrib'
+   解决方法：from tensorflow.compat.v1.nn.rnn_cell import LSTMStateTuple
+4. with tf.variable_scope('seq2seq_placeholder'):
+   问题： module 'tensorflow' has no attribute 'variable_scope'
+   解决方法：with tf.compat.v1.variable_scope('seq2seq_placeholder'):
+5. tf.placeholder
+   问题：module 'tensorflow' has no attribute 'placeholder'
+   解决方法：tf.compat.v1.placeholder
+6. self.encoder_inputs = tf.compat.v1.placeholder(tf.int32, [None, None], name="encoder_inputs")
+   问题：tf.placeholder() is not compatible with eager execution.
+   解决方法：在该行代码前添加 tf.compat.v1.disable_eager_execution()
+7. initializer = tf.contrib.layers.xavier_initializer()
+   问题：module 'tensorflow' has no attribute 'contrib'
+   解决方法：

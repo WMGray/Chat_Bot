@@ -52,3 +52,24 @@
 7. initializer = tf.contrib.layers.xavier_initializer()
    问题：module 'tensorflow' has no attribute 'contrib'
    解决方法：
+8. cell = tf.nn.rnn_cell.BasicLSTMCell(num_units)
+   问题：module 'tensorflow._api.v2.nn' has no attribute 'rnn_cell'
+   解决方法： tf.compat.v1.nn.rnn_cell
+9. dyn_rnn = tf.nn.bidirectional_dynamic_rnn
+   问题：module 'tensorflow._api.v2.nn' has no attribute 'bidirectional_dynamic_rnn'
+   解决方法：tf.compat.v1.nn.bidirectional_dynamic_rnn
+10. layer_inputs = tf.layers.dense()
+    问题:module 'tensorflow' has no attribute 'layers'
+    解决方法：tf.compat.v1.layer.dense
+11. attention_mechanism = BahdanauAttention(num_units=self.attn_num_units,
+   问题：missing a required argument: 'units'
+   解决方法：num_units 改为 units
+12. decoder_initial_state = decoder_cell.zero_state(batch_size=batch_size, dtype=tf.float32).clone(cell_state=encoder_states)
+    问题：'AttentionWrapper' object has no attribute 'zero_state'
+    解决方法：将`zero_state`改为`get_initial_state`
+13. training_helper = tf.contrib.seq2seq.TrainingHelper(inputs=decoder_inputs_embedded,
+    问题：module 'tensorflow' has no attribute 'contrib'
+    解决方法: 将`tf.contrib`改为`tensorflow_addons(tfa)`
+14. training_helper = tfa.seq2seq.TrainingHelper(inputs=decoder_inputs_embedded,
+    问题：AttributeError: module 'tensorflow_addons.seq2seq' has no attribute 'TrainingHelper'
+    解决方法：将TrainingHelper改为TrainingSampler
